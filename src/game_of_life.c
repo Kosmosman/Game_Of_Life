@@ -3,12 +3,14 @@
 #include <unistd.h>
 #define HIGHT 25
 #define WIDTH 80
+#define clear() printf("\033[H\033[J")
 int check_alive(char start[][WIDTH], char finish[][WIDTH], int i, int j);
 void copy_matrix(char start[][WIDTH], char finish[][WIDTH]);
 void printing(char finish[][WIDTH]);
 void first_move(char start[][WIDTH], char finish[][WIDTH], int* coordinates);
 void zero(char start[][WIDTH], char finish[][WIDTH]);
 int change_field(char start[][WIDTH], char finish[][WIDTH]);
+void skip(void);
 
 int main(void) {
     char start[HIGHT][WIDTH], finish[HIGHT][WIDTH], ch;
@@ -17,15 +19,19 @@ int main(void) {
            "Для выхода введите q, для начал игры - любую другую клавишу.\n");
     while ((ch = getchar()) != 'q') {
         zero(start, finish);
+        clear();
         first_move(start, finish, coordinates);
         skip();
+        sleep(1);
         while (change_field(start, finish) > 0) {
-            skip();
+            sleep(1);
+            //skip();
+            clear();
             printing(finish);
             copy_matrix(start, finish);
         }
-        if (getchar() == '\n') fflush(stdout);
-        skip();
+        //skip();
+        printing(finish);
         printf("Вы закончили игру! Для начала нового хода введите любой символ, для выхода введите q.\n");
     }
     return 0;
@@ -102,3 +108,6 @@ void skip(void) {
                 while (getchar() != '\n')
                     continue;
 }
+
+/* 20 20 19 19 18 19 20 21 18 18 12 12 13
+ 12 13 13 14 13 14 14 15 15 14 15 13 15 15 16 a */
