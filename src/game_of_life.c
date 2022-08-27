@@ -26,15 +26,17 @@ int main(void) {
 // Проверка клетки на жизнеспособность
 void check_alive(char start[][WIDTH], char finish[][WIDTH], int row, int column) {
     int count = 0;
-    for (int i = row - 1; i <= row + 1; i++)
-        for (int j = column - 1; j <= column + 1; j++)
-            if (start[i][j] != '.' && (i != row && j != column))
+    for (int m = row - 1; m <= row + 1; m++)
+        for (int n = column - 1; n <= column + 1; n++)
+            if ((start[m][n] == '@') && !(m == row && n == column)) {
                 count++;
+            }
     if (count < 2 || count > 3)
-        finish[row][count] = '.';
-    if (count == 3) {
-        finish[row][count] = '@';
-    }
+        finish[row][column] = '.';
+    if (count == 3)
+        finish[row][column] = '@';
+    if (count == 2 && start[row][column] == '@')
+        finish[row][column] = '@';
 }
 // Копируем матрицу из финальной версии в стартовую на каждом новом ходу
 void copy_matrix(char start[][WIDTH], char finish[][WIDTH]) {
@@ -44,9 +46,9 @@ void copy_matrix(char start[][WIDTH], char finish[][WIDTH]) {
 }
 // Печатаем поле со всеми клетками
 int printing(char start[][WIDTH], char finish[][WIDTH]) {
-    int cells = 0;
-    for (int i = 1; i < HIGHT - 1; i++) {
-        for (int j = 1; j < WIDTH - 1; j++) {
+    int i, j, cells = 0;
+    for (i = 1; i < HIGHT - 1; i++) {
+        for (j = 1; j < WIDTH - 1; j++) {
             check_alive(start, finish, i, j);
             printf("%c", finish[i][j]);
             if (finish[i][j] == '@')
@@ -74,12 +76,13 @@ void first_printing(char start[][WIDTH], char finish[][WIDTH], int* coordinates)
            "Для окончания ввода введите любой нечисловой символ.\n");
     while (scanf("%d%d", &coordinates[count], &coordinates[count + 1]) == 2)
         count += 2;
-    for (int x = 0, y = 1; y < count; x += 2, y += 2)
-        start[coordinates[x]][coordinates[y]] = '@';
-    for (int i = 1; i < HIGHT - 1; i++) {
-        for (int j = 1; j < WIDTH - 1; j++) {
+    for (int y = 0, x = 1; y < count; x += 2, y += 2)
+        start[coordinates[y]][coordinates[x]] = '@';
+    for (int i = 0; i < HIGHT; i++) {
+        for (int j = 1; j < WIDTH; j++) {
             printf("%c", start[i][j]);
         }
         printf("\n");
     }
+    printf("\n\n");
 }
