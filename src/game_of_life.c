@@ -18,13 +18,14 @@ int main(void) {
     while ((ch = getchar()) != 'q') {
         zero(start, finish);
         first_move(start, finish, coordinates);
-        getchar();
+        skip();
         while (change_field(start, finish) > 0) {
-            getchar();
+            skip();
             printing(finish);
             copy_matrix(start, finish);
         }
-        getchar();
+        if (getchar() == '\n') fflush(stdout);
+        skip();
         printf("Вы закончили игру! Для начала нового хода введите любой символ, для выхода введите q.\n");
     }
     return 0;
@@ -93,4 +94,11 @@ int change_field(char start[][WIDTH], char finish[][WIDTH]) {
             if (check_alive(start, finish, i, j))
                 flag = 1;
     return flag;
+}
+
+void skip(void) {
+    if (getchar() == '\n') fflush(stdout);
+            else
+                while (getchar() != '\n')
+                    continue;
 }
