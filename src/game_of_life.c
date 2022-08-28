@@ -15,6 +15,8 @@ void make_buffer_zone(char start[][WIDTH]);
 void set_keypress(void);
 void reset_keypress(void);
 void game_menu(void);
+int speed_setting(char* ch, int* m);
+void read_file(int* coordinates, FILE* stream);
 
 static struct termios with_buffer;
 
@@ -26,10 +28,8 @@ int main(void) {
     int coordinates[HIGHT * WIDTH * 2];
     zero(start, finish);
     clear();
-    printf("Добро пожаловать в Game Of Life!\n");
     first_move(start, finish, coordinates);
     make_buffer_zone(start);
-    sleep(1);
     set_keypress();
     while (change_field(start, finish) > 0 && flag > 0) {
         FD_ZERO(&settings);
@@ -37,15 +37,8 @@ int main(void) {
         tv.tv_sec = 0;
         tv.tv_usec = 0;
         int key = select(2, &settings, NULL, NULL, &tv);
-        if (key) {
-            ch = getc(stdin);
-            if (ch == '+')
-                m -= 5000;
-            if (ch == '-')
-                m += 5000;
-            if (ch == 'q')
-                flag = 0;
-        }
+        if (key)
+            flag = speed_setting(&ch, &m);
         usleep(m);
         clear();
         game_menu();
@@ -105,10 +98,23 @@ void zero(char start[][WIDTH], char finish[][WIDTH]) {
 // Вводим входные данные и печатаем новое поле
 void first_move(char start[][WIDTH], char finish[][WIDTH], int* coordinates) {
     int count = 0;
+    printf("Добро пожаловать в Game Of Life!\n");
+    printf("Выберите режим: ");
+    if (getchar() == '1') {
     printf("Введите координаты начальных клеток в формате \"y x\"."
            "Для окончания ввода введите любой нечисловой символ.\n");
     while (scanf("%d%d", &coordinates[count], &coordinates[count + 1]) == 2)
         count += 2;
+    } else {
+        char pattern[100];
+        printf("Введите путь до файла вместе с ним самим: ");
+        scanf("%s", pattern);
+        FILE* stream = fopen(pattern, "r");
+        while (fscanf(stream, "%d%d", &coordinates[count],
+                      &coordinates[count + 1]) == 2)
+            count += 2;
+        fclose(stream);
+    }
     for (int y = 0, x = 1; y < count; x += 2, y += 2) {
         start[coordinates[y] + 1][coordinates[x] + 1] = '@';
         finish[coordinates[y] + 1][coordinates[x] + 1] = '@';
@@ -160,6 +166,17 @@ void game_menu(void) {
            "для уменьшения - введите \"-\"\n");
     printf("Для выхода введите q\n");
 }
-
+// Функция, контролирующая изменение скорости и выход из игры
+int speed_setting(char* ch, int* m) {
+    int flag = 1;
+    *ch = getc(stdin);
+    if (*ch == '+' && *m > 5000)
+        *m -= 5000;
+    if (*ch == '-')
+        *m += 5000;
+    if (*ch == 'q')
+        flag = 0;
+    return flag;
+}
 /* 20 20 19 19 18 19 20 21 18 18 12 12 13
  12 13 13 14 13 14 14 15 15 14 15 13 15 15 16 a */
