@@ -1,8 +1,8 @@
 // Copyright 2022 joaquind
 #include <stdio.h>
 #include <unistd.h>
-#define HIGHT 25
-#define WIDTH 80
+#define HIGHT 27
+#define WIDTH 82
 #define clear() printf("\033[H\033[J")
 int check_alive(char start[][WIDTH], char finish[][WIDTH], int i, int j);
 void copy_matrix(char start[][WIDTH], char finish[][WIDTH]);
@@ -11,6 +11,7 @@ void first_move(char start[][WIDTH], char finish[][WIDTH], int* coordinates);
 void zero(char start[][WIDTH], char finish[][WIDTH]);
 int change_field(char start[][WIDTH], char finish[][WIDTH]);
 void skip(void);
+void make_buffer_zone(char start[][WIDTH]);
 
 int main(void) {
     char start[HIGHT][WIDTH], finish[HIGHT][WIDTH], ch;
@@ -21,6 +22,7 @@ int main(void) {
         zero(start, finish);
         clear();
         first_move(start, finish, coordinates);
+        make_buffer_zone(start);
         skip();
         sleep(1);
         while (change_field(start, finish) > 0) {
@@ -29,6 +31,7 @@ int main(void) {
             clear();
             printing(finish);
             copy_matrix(start, finish);
+            make_buffer_zone(start);
         }
         //skip();
         printing(finish);
@@ -87,8 +90,8 @@ void first_move(char start[][WIDTH], char finish[][WIDTH], int* coordinates) {
     while (scanf("%d%d", &coordinates[count], &coordinates[count + 1]) == 2)
         count += 2;
     for (int y = 0, x = 1; y < count; x += 2, y += 2) {
-        start[coordinates[y]][coordinates[x]] = '@';
-        finish[coordinates[y]][coordinates[x]] = '@';
+        start[coordinates[y] + 1][coordinates[x] + 1] = '@';
+        finish[coordinates[y] + 1][coordinates[x] + 1] = '@';
     }
     printing(finish);
 }
@@ -107,6 +110,21 @@ void skip(void) {
             else
                 while (getchar() != '\n')
                     continue;
+}
+
+void make_buffer_zone(char start[][WIDTH]) {
+    for (int i = 1; i < HIGHT - 1; i++) {
+        start[i][0] = start[i][WIDTH - 2];
+        start[i][WIDTH - 1] = start[i][1];
+    }
+    for (int j = 1; j < WIDTH - 1; j++) {
+        start[0][j] = start[HIGHT - 2][j];
+        start[HIGHT - 1][j] = start[1][j];
+    }
+    start[0][0] = start[HIGHT - 2][WIDTH - 2];
+    start[HIGHT - 1][WIDTH - 1] = start[1][1];
+    start[0][WIDTH - 1] = start[HIGHT - 2][1];
+    start[HIGHT - 1][0] = start[1][WIDTH - 2];
 }
 
 /* 20 20 19 19 18 19 20 21 18 18 12 12 13
