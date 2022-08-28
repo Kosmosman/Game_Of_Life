@@ -25,7 +25,8 @@ static struct termios with_buffer;
 int main(void) {
     fd_set settings;
     struct timeval tv;
-    int m = 100000;
+    int m = 100000, flag = 1;
+    flag = flag + 0;
     char start[HIGHT][WIDTH], finish[HIGHT][WIDTH], ch;
     int coordinates[HIGHT * WIDTH * 2];
     zero(start, finish);
@@ -33,7 +34,7 @@ int main(void) {
     if (first_move(start, finish, coordinates) == 1) {
     make_buffer_zone(start);
     set_keypress();
-    while (change_field(start, finish) > 0 && int flag > 0) {
+    while (change_field(start, finish) > 0 && flag > 0) {
         FD_ZERO(&settings);
         FD_SET(0, &settings);
         tv.tv_sec = 0;
@@ -54,7 +55,7 @@ int main(void) {
     }
     return 0;
 }
-// Проверка клетки на жизнеспособность
+
 int check_alive(char start[][WIDTH], char finish[][WIDTH],
                 int row, int column) {
     int count = 0, flag = 0;
@@ -74,13 +75,13 @@ int check_alive(char start[][WIDTH], char finish[][WIDTH],
     }
     return flag;
 }
-// Копируем матрицу из финальной версии в стартовую на каждом новом ходу
+
 void copy_matrix(char start[][WIDTH], char finish[][WIDTH]) {
     for (int i = 0; i < HIGHT; i++)
         for (int j = 0; j < WIDTH; j++)
             start[i][j] = finish[i][j];
 }
-// Печатаем поле со всеми клетками
+
 void printing(char finish[][WIDTH]) {
     for (int i = 1; i < HIGHT - 1; i++) {
         for (int j = 1; j < WIDTH - 1; j++) {
@@ -90,7 +91,7 @@ void printing(char finish[][WIDTH]) {
     }
     printf("\n\n");
 }
-// Заполняем поле пробелами перед стартом каждой игры
+
 void zero(char start[][WIDTH], char finish[][WIDTH]) {
     for (int i = 0; i < HIGHT; i++)
         for (int j = 0; j < WIDTH; j++) {
@@ -98,11 +99,12 @@ void zero(char start[][WIDTH], char finish[][WIDTH]) {
             finish[i][j] = '.';
         }
 }
-// Вводим входные данные и печатаем новое поле
+
 int first_move(char start[][WIDTH], char finish[][WIDTH], int* coordinates) {
     int in;
     char ch;
-    int res = 1;
+    int res = 1, try = 0;
+    try = try + 0;
     int count = 0;
     printf("Добро пожаловать в Game Of Life!\n");
     printf("Выберите режим: \n");
@@ -118,7 +120,7 @@ int first_move(char start[][WIDTH], char finish[][WIDTH], int* coordinates) {
     }
     return res;
 }
-// Изменение клеток, отображаемое на конечном поле finish
+
 int change_field(char start[][WIDTH], char finish[][WIDTH]) {
     int flag = 0;
     for (int i = 1; i < HIGHT - 1; i++)
@@ -127,8 +129,7 @@ int change_field(char start[][WIDTH], char finish[][WIDTH]) {
                 flag = 1;
     return flag;
 }
-// Создание оболочки вокруг основного поля,
-// где указываются значения соседних клеток
+
 void make_buffer_zone(char start[][WIDTH]) {
     for (int i = 1; i < HIGHT - 1; i++) {
         start[i][0] = start[i][WIDTH - 2];
@@ -143,7 +144,7 @@ void make_buffer_zone(char start[][WIDTH]) {
     start[0][WIDTH - 1] = start[HIGHT - 2][1];
     start[HIGHT - 1][0] = start[1][WIDTH - 2];
 }
-// Перевод в неканонический режим для небуферизированного ввода символов
+
 void set_keypress(void) {
     struct termios without_buffer;
     tcgetattr(0, &with_buffer);
@@ -153,17 +154,17 @@ void set_keypress(void) {
     without_buffer.c_cc[VMIN] = 1;
     tcsetattr(0, TCSANOW, &without_buffer);
 }
-// Возврак к каноническому режиму
+
 void reset_keypress(void) {
     tcsetattr(0, TCSANOW, &with_buffer);
 }
-// Игровое меню, постоянно отображающееся во время игры
+
 void game_menu(void) {
     printf("Для увеличения скорости введите \"+\","
            "для уменьшения - введите \"-\"\n");
     printf("Для выхода введите q\n");
 }
-// Функция, контролирующая изменение скорости и выход из игры
+
 int speed_setting(char* ch, int* m) {
     int flag = 1;
     *ch = getc(stdin);
@@ -175,8 +176,7 @@ int speed_setting(char* ch, int* m) {
         flag = 0;
     return flag;
 }
-/* 20 20 19 19 18 19 20 21 18 18 12 12 13
- 12 13 13 14 13 14 14 15 15 14 15 13 15 15 16 a */
+
 int first_choice(char start[][WIDTH], char finish[][WIDTH], int* coordinates, int res, int try, int count) {
     printf("Введите координаты начальных клеток в формате \"y x\"."
            "Для окончания ввода введите 'g'.\n");
