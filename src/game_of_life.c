@@ -1,4 +1,4 @@
-// Copyright 2022 joaquind
+// Copyright 2022 joaquind, ngandean, kazutoty
 #include <stdio.h>
 #include <unistd.h>
 #include <termios.h>
